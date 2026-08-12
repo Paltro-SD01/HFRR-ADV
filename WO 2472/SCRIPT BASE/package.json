@@ -1,0 +1,13 @@
+{
+  "name": "hfrr-adv-control-dashboard",
+  "version": "1.0.0",
+  "description": "Industrial LVDT and Thermal Monitoring Workstation",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^38.4.0"
+  }
+}

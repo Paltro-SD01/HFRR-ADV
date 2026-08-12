@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full light">
+<head>
+    <meta charset="UTF-8">
+    <title>Master Telemetry Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            darkBg: '#0b0f19',
+                            darkCard: '#131c2e',
+                            darkBorder: '#1e293b',
+                            lightBg: '#f8fafc',
+                            lightCard: '#ffffff',
+                            lightBorder: '#e2e8f0',
+                            accent: '#3b82f6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 9999px;
+        }
+        .light ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="light bg-[#fdfdfd] text-slate-800 h-full flex flex-col font-sans antialiased overflow-hidden selection:bg-blue-500/30">
+
+    <div id="loginScreenOverlay" class="fixed inset-0 z-[200] flex bg-brand-lightBg dark:bg-brand-darkBg">
+        <div class="hidden md:flex md:w-1/2 h-full bg-slate-100 dark:bg-slate-950 items-center justify-center p-8 border-r border-brand-lightBorder dark:border-brand-darkBorder relative overflow-hidden">
+            <div class="absolute w-[300px] h-[300px] rounded-full bg-blue-500/5 blur-[80px] top-12 left-12 animate-pulse pointer-events-none"></div>
+            <div class="max-w-[85%] max-h-[80%] rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-brand-darkCard p-4">
+                <img src="images/HFRR ADV.png" alt="HFRR ADV System Display" class="w-full h-full object-contain rounded-xl select-none" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\'p-8 text-center text-xs text-slate-400 font-mono\'>System Branding Asset View Container<br><span class=\'text-[10px] text-slate-500\'>[ images/HFRR ADV.png ]</span></div>';">
+            </div>
+        </div>
+
+        <div class="w-full md:w-1/2 h-full flex flex-col justify-center p-12 relative overflow-y-auto">
+            <div class="absolute top-6 right-6">
+                <button onclick="toggleTheme()" class="flex items-center justify-center p-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm dark:bg-slate-900/60 dark:border-slate-800 dark:text-slate-300 dark:hover:text-white backdrop-blur-md">
+                    <span id="loginThemeIcon" class="text-sm">🌙</span>
+                </button>
+            </div>
+
+            <div class="w-full max-w-[380px] mx-auto flex flex-col gap-6 my-auto">
+                <div class="flex flex-col gap-1.5">
+                    <div class="h-10 w-10 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 mb-2">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Station Authorization</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Provide operator signatures to sync instrumentation controls.</p>
+                </div>
+
+                <form id="loginForm" onsubmit="transitionToSetup(event)" class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Operator Credentials ID</label>
+                        <input required type="text" placeholder="e.g., Engineer Name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-900 placeholder-slate-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all dark:bg-slate-950/60 dark:border-slate-800 dark:text-slate-200 dark:placeholder-slate-600">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Access Passkey</label>
+                        <input required type="password" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-900 placeholder-slate-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all dark:bg-slate-950/60 dark:border-slate-800 dark:text-slate-200 dark:placeholder-slate-600">
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm py-3.5 rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/10 active:scale-[0.98] mt-2">
+                        Authenticate Station
+                    </button>
+                </form>
+            </div>
+            <div class="absolute bottom-6 left-0 right-0 text-center px-4">
+                <p class="text-[10px] text-slate-400 dark:text-slate-500 font-mono tracking-tight">Active Work Order Mapping Context:<br><span class="text-slate-600 dark:text-slate-400 font-semibold">C:\LAB-IQ\HFRR Adv\WO 2472</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="testSetupDashboard" class="hidden fixed inset-0 z-[150] flex flex-col bg-brand-lightBg dark:bg-brand-darkBg overflow-y-auto p-6 md:p-12">
+        <div class="max-w-6xl w-full mx-auto flex flex-col gap-6">
+            <div class="flex justify-between items-center border-b border-brand-lightBorder pb-4 dark:border-brand-darkBorder">
+                <div>
+                    <h2 id="setupDashboardTitle" class="text-xl font-bold text-slate-900 dark:text-slate-100">ASTM D6079 Test Conditions</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Initialize work order parameters before activating hardware streams.</p>
+                </div>
+                <button onclick="toggleTheme()" class="flex items-center justify-center p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm dark:bg-brand-darkCard dark:border-brand-darkBorder dark:text-slate-300">
+                    <span id="setupThemeIcon" class="text-sm">🌙</span>
+                </button>
+            </div>
+
+            <form id="setupForm" onsubmit="bypassLoginSequence(event)" class="flex flex-col gap-6">
+                <div class="bg-white border border-brand-lightBorder rounded-2xl p-6 shadow-sm dark:bg-brand-darkCard dark:border-brand-darkBorder">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Sample Info</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">File Name</label>
+                            <input required id="setupFileName" type="text" value="teat 001" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 dark:bg-slate-950/60 dark:border-slate-800 dark:text-slate-200">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Batch Ref No</label>
+                            <input required id="setupBatchRef" type="text" value="205668" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 dark:bg-slate-950/60 dark:border-slate-800 dark:text-slate-200">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Tested By</label>
+                            <input required id="setupTestedBy" type="text" value="user" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 dark:bg-slate-950/60 dark:border-slate-800 dark:text-slate-200">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Fluid Description</label>
+                            <input required id="setupFluidDesc" type="text" value="dfb25" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 dark:bg-slate-950/60 dark:border-slate-800 dark:text-slate-200">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Remarks</label>
+                            <input id="setupRemarks" type="text" placeholder="Optional notes..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 dark:bg-slate-950/60 dark:border-slate-800 dark:text-slate-200">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Operator ID</label>
+                            <input required id="setupOperatorId" type="text" value="0001" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 dark:bg-slate-950/60 dark:border-slate-800 dark:text-slate-200">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex flex-col gap-1.5 max-w-xs">
+                        <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Test Standard</label>
+                        <select id="setupTestStandard" onchange="handleStandardChange(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 dark:bg-slate-950/60 dark:border-slate-800 dark:text-slate-300">
+                            <option value="ASTM D6079">ASTM D6079</option>
+                            <option value="ISO 9001">ISO 9001</option>
+                            <option value="Custom">Custom</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-brand-lightBorder rounded-2xl p-6 shadow-sm dark:bg-brand-darkCard dark:border-brand-darkBorder">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Standard Default Coefficients</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div class="border-t-4 border-amber-600 bg-slate-50/70 p-5 rounded-xl flex flex-col justify-center dark:bg-slate-900/50 min-h-[90px]">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Frequency</span>
+                            <div id="coeff-freq" class="text-2xl font-bold text-blue-500 font-mono mt-1">50.0 <span class="text-xs text-slate-400 font-sans font-normal">Hz</span></div>
+                        </div>
+                        <div class="border-t-4 border-blue-500 bg-slate-50/70 p-5 rounded-xl flex flex-col justify-center dark:bg-slate-900/50 min-h-[90px]">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Applied Load</span>
+                            <div id="coeff-load" class="text-2xl font-bold text-blue-500 font-mono mt-1">2 <span class="text-xs text-slate-400 font-sans font-normal">N</span></div>
+                        </div>
+                        <div class="border-t-4 border-slate-500 bg-slate-50/70 p-5 rounded-xl flex flex-col justify-center dark:bg-slate-900/50 min-h-[90px]">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Stroke Length</span>
+                            <div id="coeff-stroke" class="text-2xl font-bold text-blue-500 font-mono mt-1">1.000 <span class="text-xs text-slate-400 font-sans font-normal">mm</span></div>
+                        </div>
+                        <div class="border-t-4 border-rose-500 bg-slate-50/70 p-5 rounded-xl flex flex-col justify-center dark:bg-slate-900/50 min-h-[90px]">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Temperature</span>
+                            <div id="coeff-temp" class="text-2xl font-bold text-blue-500 font-mono mt-1">60 <span class="text-xs text-slate-400 font-sans font-normal">°C</span></div>
+                        </div>
+                        <div class="border-t-4 border-orange-400 bg-slate-50/70 p-5 rounded-xl flex flex-col justify-center dark:bg-slate-900/50 min-h-[90px]">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Humidity</span>
+                            <div id="coeff-humid" class="text-2xl font-bold text-blue-500 font-mono mt-1">53 <span class="text-xs text-slate-400 font-sans font-normal">%RH</span></div>
+                        </div>
+                        <div class="border-t-4 border-cyan-400 bg-slate-50/70 p-5 rounded-xl flex flex-col justify-center dark:bg-slate-900/50 min-h-[90px]">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Test Duration</span>
+                            <div id="coeff-duration" class="text-2xl font-bold text-blue-500 font-mono mt-1">75 <span class="text-xs text-slate-400 font-sans font-normal">min</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end mt-2">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-10 py-3 rounded-xl transition-all shadow-lg shadow-blue-500/20 active:scale-[0.98]">
+                        Save Parameters & Open Console
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="mainControlAppDashboard" class="hidden h-full flex flex-col w-full bg-[#f4f7f6]">
+        
+        <div class="w-full bg-white border-b border-gray-200 px-4 py-2 flex flex-wrap items-center justify-between shadow-sm z-10">
+            <div class="flex items-center gap-3">
+                <div class="text-blue-700 font-black font-mono text-lg tracking-tighter">ipaltro <span class="text-xs font-semibold text-gray-500 font-sans">HFRR adv</span></div>
+                <div class="h-4 w-px bg-gray-300 mx-2"></div>
+                <span id="appMetaSubline" class="text-xs font-bold text-gray-400 tracking-wide uppercase">ASTM D6079 TEST CONDITIONS</span>
+            </div>
+            
+            <div class="flex items-center gap-4 text-[11px] font-bold text-gray-700">
+                <div class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-red-600"></span> Port 1</div>
+                <div class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-red-600"></span> Port 2</div>
+                <div class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-red-600"></span> Humidity Port</div>
+                <div class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-red-600"></span> Power Status</div>
+                <div class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-red-600"></span> Test Status</div>
+                <div class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-red-600"></span> AR</div>
+                <div class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-red-600"></span> Data</div>
+                <div class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-red-600"></span> Health</div>
+            </div>
+        </div>
+
+        <div class="w-full bg-white border-b border-gray-200 px-6 py-2 flex items-center justify-between z-10">
+            <div class="flex gap-1">
+                <button onclick="navigateToView('dashboard')" id="nav-home" class="px-5 py-1.5 rounded text-xs font-medium text-gray-600 hover:bg-gray-100 transition">Home</button>
+                <button onclick="navigateToView('dashboard')" id="nav-testsetup" class="px-5 py-1.5 rounded text-xs font-medium text-gray-600 hover:bg-gray-100 transition">Test Setup</button>
+                <button onclick="navigateToView('dashboard')" id="nav-dashboard" class="px-5 py-1.5 rounded border border-gray-300 bg-white font-bold text-xs text-blue-600 shadow-sm">Dashboard</button>
+                <button onclick="navigateToView('imaging')" id="nav-imaging" class="px-5 py-1.5 rounded text-xs font-medium text-gray-600 hover:bg-gray-100 transition">Imaging</button>
+                <button onclick="navigateToView('report')" id="nav-report" class="px-5 py-1.5 rounded text-xs font-medium text-gray-600 hover:bg-gray-100 transition">Report</button>
+                <button onclick="navigateToView('analysis')" id="nav-analysis" class="px-5 py-1.5 rounded text-xs font-medium text-gray-600 hover:bg-gray-100 transition">Analysis</button>
+                <button onclick="navigateToView('dashboard')" id="nav-about" class="px-5 py-1.5 rounded text-xs font-medium text-gray-600 hover:bg-gray-100 transition">About</button>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div id="liveClockDisplay" class="bg-gray-50 border border-gray-200 px-4 py-1.5 rounded font-mono text-xs font-bold text-gray-800 shadow-inner">01:27:52:PM 22:April:2026</div>
+                <button onclick="toggleTheme()" class="p-1 rounded bg-gray-100 text-xs grayscale">🌙</button>
+            </div>
+        </div>
+
+        <div class="w-full bg-white px-6 py-3 border-b border-gray-200 flex items-center justify-between shadow-sm z-10">
+            <div class="flex gap-2">
+                <button class="bg-[#107c41] hover:bg-emerald-700 text-white font-bold px-5 py-2 rounded text-xs tracking-wide shadow transition-all">Manual Start Test</button>
+                <button class="bg-[#004b93] hover:bg-blue-800 text-white font-bold px-5 py-2 rounded text-xs tracking-wide shadow transition-all">Auto Start Test</button>
+                <button onclick="dispatchHardwareEvent('tare')" class="bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold px-5 py-2 rounded text-xs border border-gray-300 transition shadow-sm">Tare Matrix</button>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="w-56 bg-gray-200 h-2 rounded-full overflow-hidden">
+                    <div class="bg-blue-600 h-full w-[0%]"></div>
+                </div>
+                <span class="text-xs font-bold text-gray-800 font-mono">0.00 <span class="font-sans font-normal text-gray-500 text-[11px]">mins remaining</span></span>
+            </div>
+        </div>
+
+        <div id="viewContainerDashboard" class="flex-1 grid grid-cols-12 gap-4 p-4 min-h-0 overflow-hidden">
+            
+            <div class="col-span-9 flex flex-col gap-4 min-h-0">
+                
+                <div class="flex items-center justify-between bg-white px-4 py-3 border border-gray-200 rounded shadow-sm flex-shrink-0">
+                    <div class="flex gap-2">
+                        <button id="tabButtonNumeric" onclick="switchConsoleMode('numeric')" class="px-4 py-1.5 bg-white border border-gray-300 font-bold text-gray-800 text-[11px] rounded shadow-sm">Numeric Display</button>
+                        <button id="tabButtonGraph" onclick="switchConsoleMode('graph')" class="px-4 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 text-[11px] rounded transition">Graph Display</button>
+                    </div>
+                    
+                    <div class="border border-gray-300 bg-white shadow-sm px-4 py-1.5 rounded flex items-center gap-4">
+                        <span class="text-[11px] font-bold text-gray-800">Ambient Humidity :</span>
+                        <span id="cell-Ambient_Humidity_Top" class="font-mono font-black text-sm text-gray-900">0.00</span>
+                        <span class="text-[10px] font-bold text-gray-400">%RH</span>
+                    </div>
+                </div>
+
+                <div id="consoleViewNumeric" class="flex-1 grid grid-cols-2 gap-4 min-h-0 overflow-y-auto pb-2 pr-1">
+                    
+                    <div class="flex flex-col gap-4">
+                        <div class="bg-white border-t-[4px] border-blue-600 border-x border-b border-gray-200 shadow-sm p-4 flex-1 min-h-[160px] flex flex-col justify-between rounded-b relative overflow-hidden">
+                            <div>
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block">Coefficient of Friction</span>
+                                <div id="cell-Cof" class="text-4xl font-black font-mono text-gray-800 tracking-tight mt-2">0.000</div>
+                            </div>
+                            <div class="h-16 w-full opacity-40 mt-2">
+                                <canvas id="canvasCOFMini"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#effef4] border-t-[4px] border-emerald-500 border-x border-b border-gray-200 shadow-sm p-4 flex-1 min-h-[160px] flex flex-col justify-between rounded-b relative overflow-hidden">
+                            <div>
+                                <span class="text-xs font-bold text-gray-600 uppercase tracking-wider block">Frictional Force ( N )</span>
+                                <div id="cell-Friction_Force_N" class="text-4xl font-black font-mono text-emerald-800 tracking-tight mt-2">0.000</div>
+                            </div>
+                            <div class="h-16 w-full opacity-40 mt-2">
+                                <canvas id="canvasFFMini"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#f2f4f8] border-t-[4px] border-gray-500 border-x border-b border-gray-200 shadow-sm p-4 flex-1 min-h-[140px] flex flex-col justify-between rounded-b relative">
+                            <div class="flex justify-between items-center w-full">
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Electrical Contact Resistance</span>
+                                <span class="text-xs text-gray-400">🔒</span>
+                            </div>
+                            <div id="cell-ECR" class="text-4xl font-black font-mono text-slate-800 tracking-tight mt-2">0 <span class="text-lg font-normal text-gray-400">%</span></div>
+                            <div class="text-[11px] text-gray-400 font-medium">Automatic hardware matrix dampening channel active</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-4">
+                        <div class="bg-[#fff6f6] border-t-[4px] border-red-500 border-x border-b border-gray-200 shadow-sm p-4 flex-1 min-h-[160px] flex flex-col justify-between rounded-b relative">
+                            <div class="absolute top-4 right-4 text-right">
+                                <span class="text-[10px] text-gray-400 block uppercase font-bold tracking-wider">Set Point</span>
+                                <span class="text-red-600 font-mono font-black text-sm">60.0 °C</span>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-gray-600 uppercase tracking-wider block">Fluid Temperature</span>
+                                <div id="cell-Stemp_Temp" class="text-4xl font-black font-mono text-red-800 tracking-tight mt-2">0.0 <span class="text-lg font-normal text-gray-400">°C</span></div>
+                            </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-red-100/60 mt-4">
+                                <div class="flex items-center gap-2 bg-white rounded-lg border border-gray-200 p-1 shadow-sm">
+                                    <input id="heaterInputField" type="number" value="60" class="w-12 text-sm font-bold font-mono text-gray-700 outline-none bg-transparent text-center">
+                                    <button onclick="applyThermalTarget()" class="text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1 rounded-md shadow-sm transition">Set Temp</button>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Heater Relay</span>
+                                    <span class="w-8 h-4 bg-gray-200 rounded-full inline-block relative border border-gray-300">
+                                        <span class="w-3 h-3 bg-white rounded-full absolute left-0.5 top-0.5 shadow"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#fffdf0] border-t-[4px] border-orange-400 border-x border-b border-gray-200 shadow-sm p-4 flex-1 min-h-[140px] flex flex-col justify-between rounded-b relative">
+                            <div class="absolute top-4 right-4">
+                                <span class="text-[10px] text-gray-400 block uppercase font-bold tracking-wider">Preset Target</span>
+                                <span class="text-orange-500 font-mono font-black text-sm">1.000 mm</span>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-gray-600 uppercase tracking-wider block">LVDT Stroke Length</span>
+                                <div id="cell-LVDT_Stroke" class="text-4xl font-black font-mono text-orange-800 tracking-tight mt-2">0.000 <span class="text-lg font-normal text-gray-400">mm</span></div>
+                            </div>
+                            
+                            <div class="w-full mt-4">
+                                <div class="h-1 bg-gray-300 relative w-full mb-1 rounded-full">
+                                    <div class="absolute -top-1 left-0 h-3 w-px bg-gray-500"></div>
+                                    <div class="absolute -top-1 left-1/4 h-3 w-px bg-gray-500"></div>
+                                    <div class="absolute -top-1 left-1/2 h-3 w-px bg-gray-500"></div>
+                                    <div class="absolute -top-1 left-3/4 h-3 w-px bg-gray-500"></div>
+                                    <div class="absolute -top-1 right-0 h-3 w-px bg-gray-500"></div>
+                                    <span class="w-2.5 h-2.5 bg-amber-600 rounded-full absolute -top-0.5 left-1/2 -ml-1.25 shadow"></span>
+                                </div>
+                                <div class="flex justify-between text-[9px] font-mono font-bold text-gray-400 px-0.5">
+                                    <span>-0.50</span><span>-0.25</span><span>0.00</span><span>0.25</span><span>0.50</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="bg-[#fdf2ff] border-b border-gray-200 border-x p-3 rounded shadow-sm">
+                                <span class="text-[10px] font-bold text-purple-400 uppercase block tracking-wider">Frequency</span>
+                                <div class="text-xl font-black font-mono text-purple-900 mt-1">50.0 <span class="text-xs font-normal text-gray-400">Hz</span></div>
+                            </div>
+                            <div class="bg-[#f8f9ee] border-b border-gray-200 border-x p-3 rounded shadow-sm">
+                                <span class="text-[10px] font-bold text-olive-600 uppercase block tracking-wider">Air Temp</span>
+                                <div id="cell-AmbTemp" class="text-xl font-black font-mono text-amber-900 mt-1">0.0 <span class="text-xs font-normal text-gray-400">°C</span></div>
+                            </div>
+                            <div class="bg-[#f0f4ff] border-b border-gray-200 border-x p-3 rounded shadow-sm">
+                                <span class="text-[10px] font-bold text-indigo-400 uppercase block tracking-wider">Humidity</span>
+                                <div id="cell-HUMID_RH" class="text-xl font-black font-mono text-indigo-900 mt-1">0.0 <span class="text-xs font-normal text-gray-400">%</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="consoleViewGraph" class="hidden flex-1 flex flex-col gap-4 min-h-0">
+                    <div class="flex-1 bg-white p-3 border border-gray-200 rounded shadow-sm relative h-36">
+                        <canvas id="canvasFrictionForce"></canvas>
+                    </div>
+                    <div class="flex-1 bg-white p-3 border border-gray-200 rounded shadow-sm relative h-36">
+                        <canvas id="canvasCOF"></canvas>
+                    </div>
+                    <div class="flex-1 bg-white p-3 border border-gray-200 rounded shadow-sm relative h-36">
+                        <canvas id="canvasAtmospherics"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-span-3 bg-white border border-gray-300 rounded shadow-sm flex flex-col min-h-0">
+                <div class="px-3 py-2.5 border-b border-gray-200 bg-gray-50 text-[10px] font-bold uppercase tracking-wide text-gray-500">EVENT ENGINE DIAGNOSTICS LOG</div>
+                <textarea id="diagnosticTerminal" readonly class="w-full flex-1 p-3 bg-white text-[11px] text-slate-600 font-mono resize-none outline-none leading-relaxed overflow-y-auto select-text"></textarea>
+            </div>
+
+        </div>
+
+        <div id="viewContainerImaging" class="hidden flex-1 p-6 bg-[#f4f7f6]">
+            <div class="w-full h-full border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-400">
+                <span class="text-lg font-bold">Imaging Module View Workspace</span>
+                <span class="text-xs">Layout staging container interface. UI definitions will mount here.</span>
+            </div>
+        </div>
+
+        <div id="viewContainerReport" class="hidden flex-1 p-6 bg-[#f4f7f6]">
+            <div class="w-full h-full border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-400">
+                <span class="text-lg font-bold">Report Generation Engine Workspace</span>
+                <span class="text-xs">Layout staging container interface. UI definitions will mount here.</span>
+            </div>
+        </div>
+
+        <div id="viewContainerAnalysis" class="hidden flex-1 p-6 bg-[#f4f7f6]">
+            <div class="w-full h-full border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-400">
+                <span class="text-lg font-bold">Advanced Data Analytics Analytics Workspace</span>
+                <span class="text-xs">Layout staging container interface. UI definitions will mount here.</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function navigateToView(targetViewId) {
+            document.getElementById("viewContainerDashboard").classList.add("hidden");
+            document.getElementById("viewContainerImaging").classList.add("hidden");
+            document.getElementById("viewContainerReport").classList.add("hidden");
+            document.getElementById("viewContainerAnalysis").classList.add("hidden");
+            
+            const navigationTargets = ["home", "testsetup", "dashboard", "imaging", "report", "analysis", "about"];
+            navigationTargets.forEach(navKey => {
+                const navBtn = document.getElementById(`nav-${navKey}`);
+                if (navBtn) {
+                    navBtn.className = "px-5 py-1.5 rounded text-xs font-medium text-gray-600 hover:bg-gray-100 transition";
+                }
+            });
+
+            if (targetViewId === "imaging") {
+                document.getElementById("viewContainerImaging").classList.remove("hidden");
+                document.getElementById("nav-imaging").className = "px-5 py-1.5 rounded border border-gray-300 bg-white font-bold text-xs text-blue-600 shadow-sm";
+            } else if (targetViewId === "report") {
+                document.getElementById("viewContainerReport").classList.remove("hidden");
+                document.getElementById("nav-report").className = "px-5 py-1.5 rounded border border-gray-300 bg-white font-bold text-xs text-blue-600 shadow-sm";
+            } else if (targetViewId === "analysis") {
+                document.getElementById("viewContainerAnalysis").classList.remove("hidden");
+                document.getElementById("nav-analysis").className = "px-5 py-1.5 rounded border border-gray-300 bg-white font-bold text-xs text-blue-600 shadow-sm";
+            } else {
+                document.getElementById("viewContainerDashboard").classList.remove("hidden");
+                document.getElementById("nav-dashboard").className = "px-5 py-1.5 rounded border border-gray-300 bg-white font-bold text-xs text-blue-600 shadow-sm";
+                
+                setTimeout(() => {
+                    chartFF.resize();
+                    chartCOF.resize();
+                    chartEnv.resize();
+                }, 50);
+            }
+        }
+
+        let telemetryDisplayMode = "numeric";
+        function switchConsoleMode(targetMode) {
+            telemetryDisplayMode = targetMode;
+            const btnNumeric = document.getElementById("tabButtonNumeric");
+            const btnGraph = document.getElementById("tabButtonGraph");
+            const viewNumeric = document.getElementById("consoleViewNumeric");
+            const viewGraph = document.getElementById("consoleViewGraph");
+
+            if (targetMode === "numeric") {
+                viewNumeric.classList.remove("hidden");
+                viewGraph.classList.add("hidden");
+                btnNumeric.className = "px-4 py-1.5 bg-white border border-gray-300 font-bold text-gray-800 text-[11px] rounded shadow-sm";
+                btnGraph.className = "px-4 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 text-[11px] rounded transition";
+            } else {
+                viewNumeric.classList.add("hidden");
+                viewGraph.classList.remove("hidden");
+                btnNumeric.className = "px-4 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 text-[11px] rounded transition";
+                btnGraph.className = "px-4 py-1.5 bg-white border border-gray-300 font-bold text-gray-800 text-[11px] rounded shadow-sm";
+                
+                setTimeout(() => {
+                    chartFF.resize();
+                    chartCOF.resize();
+                    chartEnv.resize();
+                }, 50);
+            }
+        }
+
+        const maxChartDataPoints = 30;
+        const chartOptionsBase = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'monospace', size: 9 } } },
+                y: { grid: { color: 'rgba(148, 163, 184, 0.08)' }, ticks: { font: { family: 'monospace', size: 9 } } }
+            },
+            plugins: { legend: { labels: { font: { size: 10, weight: 'bold' } } } }
+        };
+
+        // INLINE MINI DISPLAY TREND PLOTS
+        const miniOptionsBase = {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { display: false }, y: { display: false } }
+        };
+
+        const chartCOFMini = new Chart(document.getElementById('canvasCOFMini').getContext('2d'), {
+            type: 'line',
+            data: { labels: [], datasets: [{ data: [], borderColor: '#2563eb', borderWidth: 2, tension: 0.2, pointRadius: 0, fill: true, backgroundColor: 'rgba(37, 99, 235, 0.04)' }] },
+            options: miniOptionsBase
+        });
+
+        const chartFFMini = new Chart(document.getElementById('canvasFFMini').getContext('2d'), {
+            type: 'line',
+            data: { labels: [], datasets: [{ data: [], borderColor: '#10b981', borderWidth: 2, tension: 0.2, pointRadius: 0, fill: true, backgroundColor: 'rgba(16, 185, 129, 0.04)' }] },
+            options: miniOptionsBase
+        });
+
+        // FULL EXPANDED VIEW CHARTS
+        const chartFF = new Chart(document.getElementById('canvasFrictionForce').getContext('2d'), {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'Friction Force (N)', data: [], borderColor: '#ef4444', borderWidth: 1.5, tension: 0.15, pointRadius: 0, fill: false }] },
+            options: chartOptionsBase
+        });
+
+        const chartCOF = new Chart(document.getElementById('canvasCOF').getContext('2d'), {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'Coefficient of Friction (COF)', data: [], borderColor: '#06b6d4', borderWidth: 1.5, tension: 0.15, pointRadius: 0, fill: false }] },
+            options: chartOptionsBase
+        });
+
+        const chartEnv = new Chart(document.getElementById('canvasAtmospherics').getContext('2d'), {
+            type: 'line',
+            data: { 
+                labels: [], 
+                datasets: [
+                    { label: 'Air Temp (°C)', data: [], borderColor: '#3b82f6', borderWidth: 1.5, tension: 0.15, pointRadius: 0, fill: false },
+                    { label: 'Humidity (%RH)', data: [], borderColor: '#f59e0b', borderWidth: 1.5, tension: 0.15, pointRadius: 0, fill: false }
+                ] 
+            },
+            options: chartOptionsBase
+        });
+
+        function toggleTheme() {
+            const body = document.body;
+            if (body.classList.contains('light')) {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                document.documentElement.classList.add('dark');
+            } else {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                document.documentElement.classList.remove('light');
+            }
+        }
+
+        function handleStandardChange(selectedVal) {
+            document.getElementById('setupDashboardTitle').innerText = `${selectedVal} Test Conditions`;
+            const freq = document.getElementById('coeff-freq');
+            const load = document.getElementById('coeff-load');
+            const stroke = document.getElementById('coeff-stroke');
+            const temp = document.getElementById('coeff-temp');
+            const humid = document.getElementById('coeff-humid');
+            const duration = document.getElementById('coeff-duration');
+
+            if (selectedVal === "ASTM D6079") {
+                freq.innerHTML = `50.0 <span class="text-xs text-slate-400 font-sans font-normal">Hz</span>`;
+                load.innerHTML = `2 <span class="text-xs text-slate-400 font-sans font-normal">N</span>`;
+                stroke.innerHTML = `1.000 <span class="text-xs text-slate-400 font-sans font-normal">mm</span>`;
+                temp.innerHTML = `60 <span class="text-xs text-slate-400 font-sans font-normal">°C</span>`;
+                humid.innerHTML = `53 <span class="text-xs text-slate-400 font-sans font-normal">%RH</span>`;
+                duration.innerHTML = `75 <span class="text-xs text-slate-400 font-sans font-normal">min</span>`;
+            } else if (selectedVal === "ISO 9001") {
+                freq.innerHTML = `40.0 <span class="text-xs text-slate-400 font-sans font-normal">Hz</span>`;
+                load.innerHTML = `5 <span class="text-xs text-slate-400 font-sans font-normal">N</span>`;
+                stroke.innerHTML = `2.000 <span class="text-xs text-slate-400 font-sans font-normal">mm</span>`;
+                temp.innerHTML = `25 <span class="text-xs text-slate-400 font-sans font-normal">°C</span>`;
+                humid.innerHTML = `60 <span class="text-xs text-slate-400 font-sans font-normal">%RH</span>`;
+                duration.innerHTML = `60 <span class="text-xs text-slate-400 font-sans font-normal">min</span>`;
+            } else { 
+                freq.innerHTML = `Variable <span class="text-xs text-slate-400 font-sans font-normal">Hz</span>`;
+                load.innerHTML = `Variable <span class="text-xs text-slate-400 font-sans font-normal">N</span>`;
+                stroke.innerHTML = `Variable <span class="text-xs text-slate-400 font-sans font-normal">mm</span>`;
+                temp.innerHTML = `Variable <span class="text-xs text-slate-400 font-sans font-normal">°C</span>`;
+                humid.innerHTML = `Variable <span class="text-xs text-slate-400 font-sans font-normal">%RH</span>`;
+                duration.innerHTML = `Variable <span class="text-xs text-slate-400 font-sans font-normal">min</span>`;
+            }
+        }
+
+        function transitionToSetup(event) {
+            event.preventDefault();
+            document.getElementById('loginScreenOverlay').style.display = 'none';
+            document.getElementById('testSetupDashboard').classList.remove('hidden');
+        }
+
+        function bypassLoginSequence(event) {
+            event.preventDefault();
+            const filename = document.getElementById('setupFileName').value;
+            const batchNo = document.getElementById('setupBatchRef').value;
+            const operator = document.getElementById('setupOperatorId').value;
+            const standard = document.getElementById('setupTestStandard').value;
+            
+            document.getElementById('testSetupDashboard').style.display = 'none';
+            document.getElementById('mainControlAppDashboard').classList.remove('hidden');
+
+            setInterval(() => {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', { hour12: true }).replace(/ /g, ':');
+                const dateStr = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).replace(/ /g, ':');
+                document.getElementById('liveClockDisplay').innerText = `${timeStr} ${dateStr}`;
+            }, 1000);
+
+            if (wsChannel.readyState === WebSocket.OPEN) {
+                wsChannel.send(JSON.stringify({
+                    "action": "initialize_metadata",
+                    "file_name": filename,
+                    "batch_ref": batchNo,
+                    "operator_id": operator,
+                    "test_standard": standard,
+                    "tested_by": document.getElementById('setupTestedBy').value,
+                    "fluid_desc": document.getElementById('setupFluidDesc').value,
+                    "remarks": document.getElementById('setupRemarks').value
+                }));
+            }
+        }
+
+        const wsChannel = new WebSocket("ws://127.0.0.1:8000/ws");
+        
+        wsChannel.onmessage = (messageEvent) => {
+            const parsedFrame = JSON.parse(messageEvent.data);
+            if (parsedFrame.event === "telemetry") {
+                Object.keys(parsedFrame.data).forEach(dataKey => {
+                    const viewTarget = document.getElementById(`cell-${dataKey}`);
+                    if (viewTarget) {
+                        viewTarget.innerText = parsedFrame.data[dataKey];
+                    }
+                    if (dataKey === "HUMID_RH") {
+                        const topHumid = document.getElementById('cell-Ambient_Humidity_Top');
+                        if (topHumid) topHumid.innerText = parsedFrame.data[dataKey];
+                    }
+                });
+
+                if (parsedFrame.data["Timestamp"]) {
+                    const stamp = parsedFrame.data["Timestamp"];
+                    const fForce = parseFloat(parsedFrame.data["Friction_Force_N"]) || 0;
+                    const fCof = parseFloat(parsedFrame.data["Cof"]) || 0;
+                    const fAirTemp = parseFloat(parsedFrame.data["AmbTemp"]) || 0;
+                    const fHumid = parseFloat(parsedFrame.data["HUMID_RH"]) || 0;
+
+                    // Update mini trend charts
+                    chartCOFMini.data.labels.push(stamp);
+                    chartCOFMini.data.datasets[0].data.push(fCof);
+                    chartFFMini.data.labels.push(stamp);
+                    chartFFMini.data.datasets[0].data.push(fForce);
+
+                    if (chartCOFMini.data.labels.length > 15) {
+                        chartCOFMini.data.labels.shift(); chartCOFMini.data.datasets[0].data.shift();
+                        chartFFMini.data.labels.shift(); chartFFMini.data.datasets[0].data.shift();
+                    }
+                    chartCOFMini.update('none');
+                    chartFFMini.update('none');
+
+                    // Update full charts
+                    chartFF.data.labels.push(stamp);
+                    chartFF.data.datasets[0].data.push(fForce);
+                    if (chartFF.data.labels.length > maxChartDataPoints) {
+                        chartFF.data.labels.shift();
+                        chartFF.data.datasets[0].data.shift();
+                    }
+
+                    chartCOF.data.labels.push(stamp);
+                    chartCOF.data.datasets[0].data.push(fCof);
+                    if (chartCOF.data.labels.length > maxChartDataPoints) {
+                        chartCOF.data.labels.shift();
+                        chartCOF.data.datasets[0].data.shift();
+                    }
+
+                    chartEnv.data.labels.push(stamp);
+                    chartEnv.data.datasets[0].data.push(fAirTemp);
+                    chartEnv.data.datasets[1].data.push(fHumid);
+                    if (chartEnv.data.labels.length > maxChartDataPoints) {
+                        chartEnv.data.labels.shift();
+                        chartEnv.data.datasets[0].data.shift();
+                        chartEnv.data.datasets[1].data.shift();
+                    }
+                    
+                    if (telemetryDisplayMode === "graph") {
+                        chartFF.update('none');
+                        chartCOF.update('none');
+                        chartEnv.update('none');
+                    }
+                }
+
+            } else if (parsedFrame.event === "log") {
+                const logsBox = document.getElementById("diagnosticTerminal");
+                if (logsBox) {
+                    logsBox.value += `[${new Date().toLocaleTimeString()}] ${parsedFrame.data}\n`;
+                    logsBox.scrollTop = logsBox.scrollHeight;
+                }
+            }
+        };
+
+        function dispatchHardwareEvent(actionName) {
+            wsChannel.send(JSON.stringify({ "action": actionName }));
+        }
+
+        function applyThermalTarget() {
+            const inputVal = document.getElementById("heaterInputField").value;
+            wsChannel.send(JSON.stringify({ "action": "set_heater", "value": inputVal }));
+        }
+    </script>
+</body>
+</html>

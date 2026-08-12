@@ -1,0 +1,95 @@
+# ==========================================
+# 1. FIXES FOR TYPOS IN YOUR ORIGINAL DRAFT
+# ==========================================
+# (Fixed merged lines for video/python files)
+*.mp4
+*.pyc
+*.pyd
+
+# ==========================================
+# 2. LABVIEW SPECIFIC IGNORES
+# ==========================================
+# Temp, backup, & local project configurations
+*~
+*.bak
+*.aliases
+*.lvlps
+*.bin
+
+# LabVIEW compilation caches & lock files
+*.lcl
+*.lck
+*.tmp
+
+# Common LabVIEW data & report logs (TDMS/TDM)
+*.tdms
+*.tdm
+*.tdms_index
+
+# Build output folders & generated executables
+builds/
+Builds/
+/Build/
+/build/
+*.exe
+*.msi
+
+# ==========================================
+# 3. PYTHON SPECIFIC IGNORES
+# ==========================================
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache & compiled binaries
+__pycache__/
+*.py[cod]
+*$py.class
+*.pkg
+
+# Python build outputs & distribution folders
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Interactive environments & tests
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ==========================================
+# 4. LARGE MEDIA, ARCHIVES & TEST DATA
+# ==========================================
+# Video recordings & audio
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Heavy data logs
+*.csv
+*.txt
+*.dat
+*.xlsx
+*.xls
+
+# Compressed archives & disk images
+*.zip
+*.iso
+*.rar
+*.7z
+*.tar.gz
+
+# ==========================================
+# 5. OS & IDE TEMPORARY FILES
+# ==========================================
+# Windows Explorer thumbnails & desktop configs
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# VS Code / IDE settings
+.vscode/
+.idea/
