@@ -15,13 +15,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          # Increased fetch-depth so Git can look back past merge commits
+          fetch-depth: 10
 
       - name: Extract Commit Info and Create File
         run: |
-          TIMESTAMP=$(git log -1 --format="%cd" --date=iso)
-          COMMENT=$(git log -1 --format="%B")
-          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})
+          # Get the commit hash of the latest actual code commit (ignoring merge commits)
+          TARGET_COMMIT=$(git log --no-merges -n 1 --format="%H")
+          
+          TIMESTAMP=$(git log -1 --format="%cd" --date=iso $TARGET_COMMIT)
+          COMMENT=$(git log -1 --format="%B" $TARGET_COMMIT)
+          
+          # List all files modified/added/deleted in that specific code commit
+          CHANGED_FILES=$(git show --pretty="" --name-only $TARGET_COMMIT)
           
           echo "🕒 Timestamp: $TIMESTAMP" > latest_commit_log.txt
           echo "💬 Comment: $COMMENT" >> latest_commit_log.txt
@@ -34,7 +40,6 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # FIXED: Added -f to force Git to add the ignored file
           git add -f latest_commit_log.txt
           
           git commit -m "docs: Auto-update commit log [skip ci]" || echo "No changes to commit"
