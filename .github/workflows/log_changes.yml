@@ -29,11 +29,21 @@ jobs:
           # List all files modified/added/deleted in that specific code commit
           CHANGED_FILES=$(git show --pretty="" --name-only $TARGET_COMMIT)
           
-          echo "🕒 Timestamp: $TIMESTAMP" > latest_commit_log.txt
+          # Extract the exact line-by-line code changes (the diff)
+          DIFF_CONTENT=$(git show --pretty="" $TARGET_COMMIT)
+          
+          # Append everything using >> to keep a running history
+          echo "=================================" >> latest_commit_log.txt
+          echo "🕒 Timestamp: $TIMESTAMP" >> latest_commit_log.txt
           echo "💬 Comment: $COMMENT" >> latest_commit_log.txt
           echo "---------------------------------" >> latest_commit_log.txt
           echo "📁 Files Changed:" >> latest_commit_log.txt
           echo "$CHANGED_FILES" >> latest_commit_log.txt
+          echo "---------------------------------" >> latest_commit_log.txt
+          echo "📝 Actual Changes Made:" >> latest_commit_log.txt
+          echo "$DIFF_CONTENT" >> latest_commit_log.txt
+          echo "" >> latest_commit_log.txt
+          echo "" >> latest_commit_log.txt
 
       - name: Commit and Push Log File
         run: |
