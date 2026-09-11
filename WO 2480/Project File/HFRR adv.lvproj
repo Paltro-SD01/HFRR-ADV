@@ -15,7 +15,8 @@
 		<Item Name="icon file" Type="Folder">
 			<Item Name="02-FR5.12.ico" Type="Document" URL="../../icon file/02-FR5.12.ico"/>
 		</Item>
-		<Item Name="HFRR ADV v044.vi" Type="VI" URL="../../HFRR ADV v044.vi"/>
+		<Item Name="HFRR ADV v01.vi" Type="VI" URL="../../HFRR ADV v01.vi"/>
+		<Item Name="HFRR ADV v02.vi" Type="VI" URL="../../HFRR ADV v02.vi"/>
 		<Item Name="Dependencies" Type="Dependencies"/>
 		<Item Name="Build Specifications" Type="Build">
 			<Item Name="LAB-IQ adv" Type="EXE">
@@ -29,26 +30,29 @@
 				<Property Name="Bld_excludeInlineSubVIs" Type="Bool">true</Property>
 				<Property Name="Bld_excludeLibraryItems" Type="Bool">true</Property>
 				<Property Name="Bld_excludePolymorphicVIs" Type="Bool">true</Property>
-				<Property Name="Bld_localDestDir" Type="Path">../builds/exe/v44</Property>
+				<Property Name="Bld_localDestDir" Type="Path">../builds/exe/v02</Property>
 				<Property Name="Bld_localDestDirType" Type="Str">relativeToCommon</Property>
 				<Property Name="Bld_modifyLibraryFile" Type="Bool">true</Property>
 				<Property Name="Bld_previewCacheID" Type="Str">{E5602A09-287A-447A-9CF0-41DE9F7E2566}</Property>
 				<Property Name="Bld_version.major" Type="Int">4</Property>
 				<Property Name="Destination[0].destName" Type="Str">LAB-IQ adv.exe</Property>
-				<Property Name="Destination[0].path" Type="Path">../builds/exe/v44/LAB-IQ adv.exe</Property>
+				<Property Name="Destination[0].path" Type="Path">../builds/exe/v02/LAB-IQ adv.exe</Property>
 				<Property Name="Destination[0].preserveHierarchy" Type="Bool">true</Property>
 				<Property Name="Destination[0].type" Type="Str">App</Property>
 				<Property Name="Destination[1].destName" Type="Str">Support Directory</Property>
-				<Property Name="Destination[1].path" Type="Path">../builds/exe/v44/data</Property>
+				<Property Name="Destination[1].path" Type="Path">../builds/exe/v02/data</Property>
 				<Property Name="DestinationCount" Type="Int">2</Property>
 				<Property Name="Exe_iconItemID" Type="Ref">/My Computer/icon file/02-FR5.12.ico</Property>
-				<Property Name="Source[0].itemID" Type="Str">{64196690-0B87-4D11-A35E-A07432AB8DC6}</Property>
+				<Property Name="Source[0].itemID" Type="Str">{BC250279-1DA2-4191-9C7F-8C82036005B5}</Property>
 				<Property Name="Source[0].type" Type="Str">Container</Property>
 				<Property Name="Source[1].destinationIndex" Type="Int">0</Property>
-				<Property Name="Source[1].itemID" Type="Ref">/My Computer/HFRR ADV v044.vi</Property>
-				<Property Name="Source[1].sourceInclusion" Type="Str">TopLevel</Property>
+				<Property Name="Source[1].itemID" Type="Ref">/My Computer/HFRR ADV v01.vi</Property>
 				<Property Name="Source[1].type" Type="Str">VI</Property>
-				<Property Name="SourceCount" Type="Int">2</Property>
+				<Property Name="Source[2].destinationIndex" Type="Int">0</Property>
+				<Property Name="Source[2].itemID" Type="Ref">/My Computer/HFRR ADV v02.vi</Property>
+				<Property Name="Source[2].sourceInclusion" Type="Str">TopLevel</Property>
+				<Property Name="Source[2].type" Type="Str">VI</Property>
+				<Property Name="SourceCount" Type="Int">3</Property>
 				<Property Name="TgtF_fileDescription" Type="Str">LAB-IQ adv</Property>
 				<Property Name="TgtF_internalName" Type="Str">LAB-IQ adv</Property>
 				<Property Name="TgtF_legalCopyright" Type="Str">Copyright © 2026 </Property>
