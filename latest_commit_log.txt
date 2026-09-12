@@ -329713,3 +329713,20 @@ index 0000000..92dd41b
 +)
 
 
+=================================
+🕒 Timestamp: 2026-09-12 15:33:06 +0530
+💬 Comment: CHANGES DONE FOR THE HUMIDITY LOOP COMMUNICATION LOGIC
+---------------------------------
+📁 Files Changed:
+WO 2480/HFRR ADV v02.vi
+WO 2480/Instrument Folder/Instrument fgv uno.vi
+---------------------------------
+📝 Actual Changes Made:
+diff --git a/WO 2480/HFRR ADV v02.vi b/WO 2480/HFRR ADV v02.vi
+index 67c20f7..ad574bc 100644
+Binary files a/WO 2480/HFRR ADV v02.vi and b/WO 2480/HFRR ADV v02.vi differ
+diff --git a/WO 2480/Instrument Folder/Instrument fgv uno.vi b/WO 2480/Instrument Folder/Instrument fgv uno.vi
+index ee6daa3..0d33aa8 100644
+Binary files a/WO 2480/Instrument Folder/Instrument fgv uno.vi and b/WO 2480/Instrument Folder/Instrument fgv uno.vi differ
+
+
